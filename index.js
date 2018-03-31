@@ -66,9 +66,11 @@ setInterval(function() {
   if (temp_obj != undefined) {
     var temp_data_expanded_url = temp_obj.data_expanded_url;
     if (temp_data_expanded_url.startsWith(process.env.URL_FILTER) && temp_data_expanded_url.includes('tag')) {
+      var d = new Date(temp_obj.data_time_ms);
+      var h = d.getHours();
       var re = /.*tag=(.*?)&.*/;
       var hashtag = temp_obj.data_expanded_url.replace(re, "$1");
-      if (hashtag && hashtag != 'Y8LRCLVC') {
+      if (hashtag && hashtag != 'Y8LRCLVC' && h >= 12) {
         var player_profile =
           "<" + encodeURI(process.env.SR_URL+hashtag) + ">\n" +
           "<" + encodeURI(process.env.DS_URL+hashtag) + ">\n" +
@@ -144,5 +146,17 @@ setInterval(function() {
 }, 6457); // every 6.457 seconds (6457)
 
 setInterval(function() {
-  customHeaderRequest.get(process.env.PM_URL, function(err, resp, body){});
+  var d = new Date((new Date).getTime());
+  var h = d.getHours();
+  if ( h < 12) {
+    customHeaderRequest.get(process.env.AM_URL, function(err, resp, body){});
+  } else {
+    customHeaderRequest.get(process.env.PM_URL, function(err, resp, body){});
+  }
+  if ( h == 23) {
+    customHeaderRequest.get(process.env.AM_URL, function(err, resp, body){});
+  }
+  if ( h == 11) {
+    customHeaderRequest.get(process.env.PM_URL, function(err, resp, body){});
+  }
 }, 300000); // every 5 minutes (300000)

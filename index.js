@@ -70,7 +70,7 @@ setInterval(function() {
       var h = d.getHours();
       var re = /.*tag=(.*?)&.*/;
       var hashtag = temp_obj.data_expanded_url.replace(re, "$1");
-      if (hashtag && hashtag != 'Y8LRCLVC' && h >= 12) {
+      if (hashtag && hashtag != 'Y8LRCLVC' && hashtag != 'LY8LJYU9' && h >= 12) {
         var player_profile =
           "<" + encodeURI(process.env.SR_URL+hashtag) + ">\n" +
           "<" + encodeURI(process.env.DS_URL+hashtag) + ">\n" +
@@ -96,8 +96,8 @@ setInterval(function() {
               url: url,
               method: "POST",
               json: {
-                "username": "Webhook",
-                "avatar_url": "https://i.imgur.com/TSHbUjV.png",
+                "username": "Tweet",
+                "avatar_url": "https://i.imgur.com/aKMjtxj.png",
                 "embeds": [
                   {
                     "author": {

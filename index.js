@@ -97,7 +97,7 @@ setInterval(function() {
               method: "POST",
               json: {
                 "username": "Tweet",
-                "avatar_url": "https://i.imgur.com/aKMjtxj.png",
+                "avatar_url": "https://i.imgur.com/0w906h7.png",
                 "embeds": [
                   {
                     "author": {
@@ -105,6 +105,7 @@ setInterval(function() {
                       "icon_url": "https://i.imgur.com/nMRazCT.png"
                     },
                     "color": 5746931,
+                    "timestamp": moment(temp_obj.data_time_ms).toISOString(),
                     "fields": [
                       {
                         "name": "Trophies",
@@ -125,9 +126,6 @@ setInterval(function() {
                     ],
                     "image": {
                       "url": goqrme
-                    },
-                    "footer": {
-                      "text": moment(temp_obj.data_time_ms).format('dddd, MMMM Do, YYYY h:mm:ss A') + " (UTC)"
                     }
                   }
                 ]

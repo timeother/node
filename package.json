@@ -4,8 +4,7 @@
   "dependencies": {
     "express": "4.15.4",
     "request": "2.85.0",
-    "cheerio": "0.22.0",
-    "moment": "2.21.0"
+    "cheerio": "0.22.0"
   },
   "engines": {
     "node": "6.11.2"

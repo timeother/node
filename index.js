@@ -1,5 +1,4 @@
 var express = require('express');
-var moment = require('moment');
 var request = require('request');
 const cheerio = require('cheerio');
 
@@ -9,9 +8,9 @@ var my_array = new Array();
 
 app.get('/', function (req, res) {
   if (min_position) {
-    res.send(moment((new Date).getTime()).format('dddd, MMMM Do, YYYY h:mm:ss A') + ' ' + min_position);
+    res.send((new Date).toISOString() + ' ' + min_position);
   } else {
-    res.send(moment((new Date).getTime()).format('dddd, MMMM Do, YYYY h:mm:ss A') + ' waiting...');
+    res.send((new Date).toISOString() + ' waiting...');
   }
 });
 
@@ -80,12 +79,17 @@ setInterval(function() {
         var player_post = encodeURI(process.env.UPDATE_URL_DOMAIN+temp_obj.permalink_path);
         customHeaderRequest.get(process.env.RA_URL+hashtag, function(err, resp, bdy){
           var url = process.env.WEBHOOK_FILTERED_URL;
+          var player_name = "";
           var trophies = "N/A";
           if (err){
             url = process.env.WEBHOOK_UNKNOWN_URL;
             console.log(err);
           } else {
             const $ = cheerio.load(bdy);
+            var text_header = $('h1.header').first().text();
+            if (typeof text_header !== typeof undefined && text_header !== false) {
+              player_name = text_header.trim() + " ";
+            }
             var text_item = $('.horizontal').first().children().first().text();
             if (typeof text_item !== typeof undefined && text_item !== false) {
               trophies = text_item.trim().replace(/\s{2,}/g,' ');
@@ -101,11 +105,11 @@ setInterval(function() {
                 "embeds": [
                   {
                     "author": {
-                      "name": "#" + hashtag,
+                      "name":  player_name + "#" + hashtag,
                       "icon_url": "https://i.imgur.com/nMRazCT.png"
                     },
                     "color": 5746931,
-                    "timestamp": moment(temp_obj.data_time_ms).toISOString(),
+                    "timestamp": (new Date(parseInt(temp_obj.data_time_ms))).toISOString(),
                     "fields": [
                       {
                         "name": "Trophies",

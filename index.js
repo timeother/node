@@ -109,7 +109,7 @@ setInterval(function() {
                       "icon_url": "https://i.imgur.com/nMRazCT.png"
                     },
                     "color": 5746931,
-                    "timestamp": (new Date(parseInt(temp_obj.data_time_ms))).toISOString(),
+                    "timestamp": d.toISOString(),
                     "fields": [
                       {
                         "name": "Trophies",

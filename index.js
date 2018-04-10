@@ -35,6 +35,7 @@ setInterval(function() {
               var twitter_atreply = $(this).find(".twitter-atreply");
               if (ReplyingToContextBelowAuthor.length == 0 && twitter_atreply.length == 0) {
                 var permalink_path = $(this).attr('data-permalink-path');
+                var data_screen_name = $(this).attr('data-screen-name');
                 var data_time_ms = parseInt($(this).find("small.time span.js-short-timestamp").attr("data-time-ms"));
                 var items = {};
                 $(this).find('a').each(function (index, element) {
@@ -44,7 +45,7 @@ setInterval(function() {
                   }
                 });
                 for(var i in items) {
-                  my_array.push({permalink_path:permalink_path, data_time_ms:data_time_ms, data_expanded_url:i});
+                  my_array.push({permalink_path:permalink_path, data_screen_name:data_screen_name, data_time_ms:data_time_ms, data_expanded_url:i});
                 }
               }
             });
@@ -81,7 +82,9 @@ setInterval(function() {
           "<" + encodeURI(process.env.RA_URL+hashtag) + ">";
         var friend_link = encodeURI(temp_obj.data_expanded_url);
         var goqrme = encodeURI(process.env.QR_URL)+encodeURIComponent(temp_obj.data_expanded_url);
-        var player_post = encodeURI(process.env.UPDATE_URL_DOMAIN+temp_obj.permalink_path);
+        var player_post =
+            "<" + encodeURI(process.env.UPDATE_URL_DOMAIN+"/"+temp_obj.data_screen_name) + ">\n" +
+            encodeURI(process.env.UPDATE_URL_DOMAIN+temp_obj.permalink_path);
         customHeaderRequest.get(process.env.RA_URL+hashtag, function(err, resp, bdy){
           var url = process.env.WEBHOOK_FILTERED_URL;
           var player_name = "";

@@ -36,12 +36,16 @@ setInterval(function() {
               if (ReplyingToContextBelowAuthor.length == 0 && twitter_atreply.length == 0) {
                 var permalink_path = $(this).attr('data-permalink-path');
                 var data_time_ms = parseInt($(this).find("small.time span.js-short-timestamp").attr("data-time-ms"));
+                var items = {};
                 $(this).find('a').each(function (index, element) {
                   var data_expanded_url = $(element).attr('data-expanded-url');
                   if (typeof data_expanded_url !== typeof undefined && data_expanded_url !== false) {
-                    my_array.push({permalink_path:permalink_path, data_time_ms:data_time_ms, data_expanded_url:data_expanded_url});
+                    items[data_expanded_url] = true; 
                   }
                 });
+                for(var i in items) {
+                  my_array.push({permalink_path:permalink_path, data_time_ms:data_time_ms, data_expanded_url:i});
+                }
               }
             });
           }
@@ -86,6 +90,7 @@ setInterval(function() {
           var previous_season_best = "";
           var max_wins = "N/A";
           var cards_won = "N/A";
+          var experience = "N/A";
           if (err){
             url = process.env.WEBHOOK_UNKNOWN_URL;
             console.log(err);
@@ -114,6 +119,10 @@ setInterval(function() {
             var text_td_cards_won = $("img[src$='tournament.png']").first().parent().find('tr').eq(2).find('td').eq(1).text();
             if (typeof text_td_cards_won !== typeof undefined && text_td_cards_won !== false) {
               cards_won = text_td_cards_won.trim().replace(/\s{2,}/g,' ');
+            }
+            var text_td_experience = $("img[src$='cards.png']").first().parent().find('tr').eq(0).find('td').eq(1).text();
+            if (typeof text_td_experience !== typeof undefined && text_td_experience !== false) {
+              experience = text_td_experience.trim().replace(/\s{2,}/g,' ');
             }
           }
           if (trophies.includes('5,2') || trophies.includes('5,3') || trophies.includes('5,4') || trophies.includes('5,5') || trophies.includes('5,6') || trophies.includes('5,7') || trophies.includes('5,8') || trophies.includes('5,9') || trophies.includes('6,') || trophies.includes('7,') || trophies.includes('N/A')) {
@@ -147,6 +156,10 @@ setInterval(function() {
                       {
                         "name": "Cards Won",
                         "value": cards_won
+                      },
+                      {
+                        "name": "Experience",
+                        "value": experience
                       },
                       {
                         "name": "Player Profile",

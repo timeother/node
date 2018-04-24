@@ -2,6 +2,7 @@ var express = require('express');
 var request = require('request');
 var moment = require('moment');
 const cheerio = require('cheerio');
+const jsesc = require('jsesc');
 
 var app = express();
 var min_position = "";
@@ -101,7 +102,7 @@ setInterval(function() {
             const $ = cheerio.load(bdy);
             var text_header = $('h1.header').first().text();
             if (typeof text_header !== typeof undefined && text_header !== false) {
-              player_name = text_header.trim() + " ";
+              player_name = jsesc(text_header.trim() + ' ');
             }
             var text_item = $('.horizontal').first().children().first().text();
             if (typeof text_item !== typeof undefined && text_item !== false) {
@@ -189,7 +190,7 @@ setInterval(function() {
             }, function (error, response, body) {
               if (error){
                 console.log(error);
-                my_array.push(temp_obj);
+                //my_array.unshift(temp_obj);
               }
             });
           }

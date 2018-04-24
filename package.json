@@ -5,6 +5,7 @@
     "express": "4.15.4",
     "request": "2.85.0",
     "moment": "2.21.0",
+    "jsesc": "2.5.1",
     "cheerio": "0.22.0"
   },
   "engines": {

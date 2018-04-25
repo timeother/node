@@ -102,7 +102,7 @@ setInterval(function() {
             const $ = cheerio.load(bdy);
             var text_header = $('h1.header').first().text();
             if (typeof text_header !== typeof undefined && text_header !== false) {
-              player_name = jsesc(text_header.trim() + ' ');
+              player_name = text_header.trim() + ' ';
             }
             var text_item = $('.horizontal').first().children().first().text();
             if (typeof text_item !== typeof undefined && text_item !== false) {

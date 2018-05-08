@@ -76,7 +76,7 @@ setInterval(function() {
       var h = d.getHours();
       var re = /.*tag=(.*?)&.*/;
       var hashtag = temp_obj.data_expanded_url.replace(re, "$1");
-      if (hashtag && hashtag != 'Y8LRCLVC' && hashtag != 'LY8LJYU9' && h >= 12) {
+      if (hashtag && hashtag != 'Y8LRCLVC' && h >= 12) {
         var player_profile =
           "<" + encodeURI(process.env.SR_URL+hashtag) + ">\n" +
           "<" + encodeURI(process.env.DS_URL+hashtag) + ">\n" +
@@ -108,11 +108,11 @@ setInterval(function() {
             if (typeof text_item !== typeof undefined && text_item !== false) {
               trophies = text_item.trim().replace(/\s{2,}/g,' ');
             }
-            var text_td_previous_season = $("img[src$='rank.png']").first().parent().find('tr').eq(7).find('td').eq(1).text();
+            var text_td_previous_season = $("img[src$='rank.png']").first().parent().find('tr:last').prev().find('td').eq(1).text();
             if (typeof text_td_previous_season !== typeof undefined && text_td_previous_season !== false) {
               previous_season = text_td_previous_season.trim().replace(/\s{2,}/g,' ');
             }
-            var text_td_previous_season_best = $("img[src$='rank.png']").first().parent().find('tr').eq(8).find('td').eq(1).text();
+            var text_td_previous_season_best = $("img[src$='rank.png']").first().parent().find('tr:last').find('td').eq(1).text();
             if (typeof text_td_previous_season_best !== typeof undefined && text_td_previous_season_best !== false) {
               previous_season_best = " / " + text_td_previous_season_best.trim().replace(/\s{2,}/g,' ');
             }

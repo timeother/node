@@ -111,15 +111,15 @@ setInterval(function() {
             if (typeof text_item !== typeof undefined && text_item !== false) {
               trophies = text_item.trim().replace(/\s{2,}/g,' ');
             }
-            var text_td_best_season_rank = $("img[src$='rank.png']").first().parent().find('tr').eq(7).find('td').eq(1).text();
+            var text_td_best_season_rank = $("img[src$='rank.png']").first().parent().find('tr').eq(2).find('td').eq(1).text();
             if (typeof text_td_best_season_rank !== typeof undefined && text_td_best_season_rank !== false) {
-              best_season_date = text_td_best_season_rank.trim().replace(/\s{2,}/g,' ');
+              best_season_rank = text_td_best_season_rank.trim().replace(/\s{2,}/g,' ');
             }
-            var text_td_best_season = $("img[src$='rank.png']").first().parent().find('tr').eq(8).find('td').eq(1).text();
+            var text_td_best_season = $("img[src$='rank.png']").first().parent().find('tr').eq(3).find('td').eq(1).text();
             if (typeof text_td_best_season !== typeof undefined && text_td_best_season !== false) {
-              best_season_date = text_td_best_season.trim().replace(/\s{2,}/g,' ');
+              best_season = text_td_best_season.trim().replace(/\s{2,}/g,' ');
             }
-            var text_td_best_season_date = $("img[src$='rank.png']").first().parent().find('tr').eq(9).find('td').eq(1).text();
+            var text_td_best_season_date = $("img[src$='rank.png']").first().parent().find('tr').eq(4).find('td').eq(1).text();
             if (typeof text_td_best_season_date !== typeof undefined && text_td_best_season_date !== false) {
               best_season_date = text_td_best_season_date.trim().replace(/\s{2,}/g,' ');
             }

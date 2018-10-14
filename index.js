@@ -144,7 +144,7 @@ setInterval(function() {
               experience = text_td_experience.trim().replace(/\s{2,}/g,' ');
             }
           }
-          if (trophies.includes('5,2') || trophies.includes('5,3') || trophies.includes('5,4') || trophies.includes('5,5') || trophies.includes('5,6') || trophies.includes('5,7') || trophies.includes('5,8') || trophies.includes('5,9') || trophies.includes('6,') || trophies.includes('7,') || trophies.includes('N/A')) {
+          if (trophies.includes('5,5') || trophies.includes('5,6') || trophies.includes('5,7') || trophies.includes('5,8') || trophies.includes('5,9') || trophies.includes('6,') || trophies.includes('7,') || trophies.includes('N/A')) {
             request({
               url: url,
               method: "POST",

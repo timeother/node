@@ -144,7 +144,7 @@ setInterval(function() {
               experience = text_td_experience.trim().replace(/\s{2,}/g,' ');
             }
           }
-          if (trophies.includes('6,') || trophies.includes('7,') || trophies.includes('N/A')) {
+          if (trophies.includes('6,3') || trophies.includes('6,4') || trophies.includes('6,5') || trophies.includes('6,6') || trophies.includes('6,7') || trophies.includes('6,8') || trophies.includes('6,9') || trophies.includes('7,') || trophies.includes('N/A')) {
             request({
               url: url,
               method: "POST",

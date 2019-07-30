@@ -6,7 +6,7 @@ const jsesc = require('jsesc');
 const https = require('https');
 
 var app = express();
-var min_position = "";
+var min_position = "thGAVUV0VFVBaGgKjJpLSThSAWgICm9cyDs4sgEjUAFQAlAFUAFQAA";
 var my_array = new Array();
 
 app.get('/', function (req, res) {

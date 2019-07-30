@@ -2,13 +2,13 @@
   "name": "node",
   "version": "0.0.1",
   "dependencies": {
-    "express": "4.15.4",
-    "request": "2.85.0",
-    "moment": "2.21.0",
-    "jsesc": "2.5.1",
+    "express": "4.17.1",
+    "request": "2.88.0",
+    "moment": "2.24.0",
+    "jsesc": "2.5.2",
     "cheerio": "0.22.0"
   },
   "engines": {
-    "node": "6.11.2"
+    "node": "12.7.0"
   }
 }

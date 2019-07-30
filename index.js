@@ -3,6 +3,7 @@ var request = require('request');
 var moment = require('moment');
 const cheerio = require('cheerio');
 const jsesc = require('jsesc');
+const https = require('https');
 
 var app = express();
 var min_position = "";
@@ -22,47 +23,72 @@ var customHeaderRequest = request.defaults({
     headers: {'User-Agent': process.env.USER_AGENT }
 })
 
+const search_options = {
+  hostname: process.env.SEARCH_HOSTNAME,
+  port: 443,
+  path: process.env.SEARCH_PATH,
+  method: 'GET'
+};
+
 setInterval(function() {
   if (min_position) {
-    customHeaderRequest.get(process.env.UPDATE_URL+encodeURIComponent(min_position), function(err, resp, body){
-      try {
-        var myObj = JSON.parse(body);
-        if (typeof myObj.max_position !== typeof undefined && myObj.max_position !== false) {
-          min_position = myObj.max_position;
-          if (typeof myObj.items_html !== typeof undefined && myObj.items_html !== false) {
-            const $ = cheerio.load(myObj.items_html);
-            $('.js-stream-tweet').each(function(i, elem) {
-              var ReplyingToContextBelowAuthor = $(this).find(".ReplyingToContextBelowAuthor");
-              var twitter_atreply = $(this).find(".twitter-atreply");
-              if (ReplyingToContextBelowAuthor.length == 0 && twitter_atreply.length == 0) {
-                var permalink_path = $(this).attr('data-permalink-path');
-                var data_screen_name = $(this).attr('data-screen-name');
-                var data_time_ms = parseInt($(this).find("small.time span.js-short-timestamp").attr("data-time-ms"));
-                var items = {};
-                $(this).find('a').each(function (index, element) {
-                  var data_expanded_url = $(element).attr('data-expanded-url');
-                  if (typeof data_expanded_url !== typeof undefined && data_expanded_url !== false) {
-                    items[data_expanded_url] = true; 
+    const update_options = {
+      hostname: process.env.UPDATE_HOSTNAME,
+      port: 443,
+      path: process.env.UPDATE_PATH+encodeURIComponent(min_position),
+      method: 'GET'
+    };
+    const update_req = https.request(update_options, (res) => {
+      res.on('data', (d) => {
+        try {
+          var myObj = JSON.parse(d);
+          if (typeof myObj.max_position !== typeof undefined && myObj.max_position !== false) {
+            min_position = myObj.max_position;
+            if (typeof myObj.items_html !== typeof undefined && myObj.items_html !== false) {
+              const $ = cheerio.load(myObj.items_html);
+              $('.js-stream-tweet').each(function(i, elem) {
+                var ReplyingToContextBelowAuthor = $(this).find(".ReplyingToContextBelowAuthor");
+                var twitter_atreply = $(this).find(".twitter-atreply");
+                if (ReplyingToContextBelowAuthor.length == 0 && twitter_atreply.length == 0) {
+                  var permalink_path = $(this).attr('data-permalink-path');
+                  var data_screen_name = $(this).attr('data-screen-name');
+                  var data_time_ms = parseInt($(this).find("small.time span.js-short-timestamp").attr("data-time-ms"));
+                  var items = {};
+                  $(this).find('a').each(function (index, element) {
+                    var data_expanded_url = $(element).attr('data-expanded-url');
+                    if (typeof data_expanded_url !== typeof undefined && data_expanded_url !== false) {
+                      items[data_expanded_url] = true; 
+                    }
+                  });
+                  for(var i in items) {
+                    my_array.push({permalink_path:permalink_path, data_screen_name:data_screen_name, data_time_ms:data_time_ms, data_expanded_url:i});
                   }
-                });
-                for(var i in items) {
-                  my_array.push({permalink_path:permalink_path, data_screen_name:data_screen_name, data_time_ms:data_time_ms, data_expanded_url:i});
                 }
-              }
-            });
+              });
+            }
           }
+        } catch(e) {
         }
-      } catch(e) {
-      }
+      });
     });
+    update_req.on('error', (e) => {
+      console.error(e);
+    });
+    update_req.end();
   } else {
-    customHeaderRequest.get(process.env.SEARCH_URL, function(err, resp, body){
-      const $ = cheerio.load(body);
-      var attr_min_pos = $('.stream-container').attr('data-min-position');
-      if (typeof attr_min_pos !== typeof undefined && attr_min_pos !== false) {
-        min_position = attr_min_pos;
-      }
+    const search_req = https.request(search_options, (res) => {
+      res.on('data', (d) => {
+        const $ = cheerio.load(d);
+        var attr_min_pos = $('.stream-container').attr('data-min-position');
+        if (typeof attr_min_pos !== typeof undefined && attr_min_pos !== false) {
+          min_position = attr_min_pos;
+        }
+      });
     });
+    search_req.on('error', (e) => {
+      console.error(e);
+    });
+    search_req.end();
   }
 }, 30000); // every 30 seconds (30000)
 

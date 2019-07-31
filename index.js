@@ -39,9 +39,14 @@ setInterval(function() {
       method: 'GET'
     };
     const update_req = https.request(update_options, (res) => {
-      res.on('data', (d) => {
+      res.setEncoding("utf8"); // makes sure that "chunk" is a string.
+      let updateFullBody = "";
+      res.on("data", data => {
+        updateFullBody += data;
+      });
+      res.on("end", () => {
         try {
-          var myObj = JSON.parse(d);
+          var myObj = JSON.parse(updateFullBody);
           if (typeof myObj.max_position !== typeof undefined && myObj.max_position !== false) {
             min_position = myObj.max_position;
             if (typeof myObj.items_html !== typeof undefined && myObj.items_html !== false) {
@@ -77,8 +82,13 @@ setInterval(function() {
     update_req.end();
   } else {
     const search_req = https.request(search_options, (res) => {
-      res.on('data', (d) => {
-        const $ = cheerio.load(d);
+      res.setEncoding("utf8"); // makes sure that "chunk" is a string.
+      let searchFullBody = "";
+      res.on("data", data => {
+        searchFullBody += data;
+      });
+      res.on("end", () => {
+        const $ = cheerio.load(searchFullBody);
         var attr_min_pos = $('.stream-container').attr('data-min-position');
         if (typeof attr_min_pos !== typeof undefined && attr_min_pos !== false) {
           min_position = attr_min_pos;

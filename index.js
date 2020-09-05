@@ -118,7 +118,7 @@ setInterval(function() {
             if (typeof text_header !== typeof undefined && text_header !== false) {
               player_name = text_header.trim() + ' ';
             }
-            var text_item = $('.horizontal').first().children().first().text();
+            var text_item = $('div.horizontal').first().children().first().text();
             if (typeof text_item !== typeof undefined && text_item !== false) {
               trophies = text_item.trim().replace(/\s{2,}/g,' ');
             }

@@ -12,10 +12,12 @@ var permalink_path_array = new Array();
 var ONE_HOUR = 60 * 60 * 1000; /* ms */
 
 var customHeaderRequest = request.defaults({
-    headers: {'User-Agent': process.env.USER_AGENT }
+  headers: {
+    'User-Agent': process.env.USER_AGENT
+  }
 })
 
-app.get('/', function (req, res) {
+app.get('/', function(req, res) {
   if (min_position) {
     res.send((new Date).toISOString() + ' ' + min_position);
   } else {
@@ -97,139 +99,156 @@ setInterval(function() {
         var player_post =
           "<" + encodeURI(process.env.UPDATE_URL_DOMAIN + temp_obj.data_screen_name) + ">\n" +
           encodeURI(process.env.UPDATE_URL_DOMAIN + temp_obj.permalink_path);
-        customHeaderRequest.get(process.env.RA_URL + hashtag, function(err, resp, bdy) {
-          var url = process.env.WEBHOOK_FILTERED_URL;
-          var player_name = "N/A";
-          var trophies = "N/A";
-          var best_season = "N/A";
-          var best_season_rank = "N/A";
-          var best_season_date = "N/A";
-          var previous_season = "N/A";
-          var previous_season_best = "";
-          var max_wins = "N/A";
-          var cards_won = "N/A";
-          var experience = "N/A";
-          if (err) {
-            url = process.env.WEBHOOK_UNKNOWN_URL;
-            console.log(err);
-          } else {
-            const $ = cheerio.load(bdy);
-            var text_header = $('h1.header').first().text();
-            if (typeof text_header !== 'undefined' && text_header !== false && text_header !== "") {
-              player_name = text_header.trim() + ' ';
-            }
-            var text_item = $('div.horizontal').first().children().first().text();
-            if (typeof text_item !== 'undefined' && text_item !== false && text_item !== "") {
-              trophies = text_item.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_best_season_rank = $("img[src$='rank.png']").first().parent().find('tr').eq(2).find('td').eq(1).text();
-            if (typeof text_td_best_season_rank !== 'undefined' && text_td_best_season_rank !== false && text_td_best_season_rank !== "") {
-              best_season_rank = text_td_best_season_rank.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_best_season = $("img[src$='rank.png']").first().parent().find('tr').eq(3).find('td').eq(1).text();
-            if (typeof text_td_best_season !== 'undefined' && text_td_best_season !== false && text_td_best_season !== "") {
-              best_season = text_td_best_season.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_best_season_date = $("img[src$='rank.png']").first().parent().find('tr').eq(4).find('td').eq(1).text();
-            if (typeof text_td_best_season_date !== 'undefined' && text_td_best_season_date !== false && text_td_best_season_date !== "") {
-              best_season_date = text_td_best_season_date.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_previous_season = $("img[src$='rank.png']").first().parent().find('tr').eq(-2).find('td').eq(1).text();
-            if (typeof text_td_previous_season !== 'undefined' && text_td_previous_season !== false && text_td_previous_season !== "") {
-              previous_season = text_td_previous_season.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_previous_season_best = $("img[src$='rank.png']").first().parent().find('tr').eq(-1).find('td').eq(1).text();
-            if (typeof text_td_previous_season_best !== 'undefined' && text_td_previous_season_best !== false && text_td_previous_season_best !== "") {
-              previous_season_best = " / " + text_td_previous_season_best.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_max_wins = $("img[src$='tournament.png']").first().parent().find('tr').eq(1).find('td').eq(1).text();
-            if (typeof text_td_max_wins !== 'undefined' && text_td_max_wins !== false && text_td_max_wins !== "") {
-              max_wins = text_td_max_wins.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_cards_won = $("img[src$='tournament.png']").first().parent().find('tr').eq(2).find('td').eq(1).text();
-            if (typeof text_td_cards_won !== 'undefined' && text_td_cards_won !== false && text_td_cards_won !== "") {
-              cards_won = text_td_cards_won.trim().replace(/\s{2,}/g, ' ');
-            }
-            var text_td_experience = $("img[src$='cards.png']").first().parent().find('tr').eq(0).find('td').eq(1).text();
-            if (typeof text_td_experience !== 'undefined' && text_td_experience !== false && text_td_experience !== "") {
-              experience = text_td_experience.trim().replace(/\s{2,}/g, ' ');
-            }
+        const ra_options = {
+          hostname: process.env.RA_HOSTNAME,
+          port: 443,
+          path: process.env.RA_PATH + hashtag,
+          method: 'GET',
+          headers: {
+            'User-Agent': process.env.USER_AGENT
           }
-          if (trophies.includes('7,') || trophies.includes('8,') || trophies.includes('N/A')) {
-            request({
-              url: url,
-              method: "POST",
-              json: {
-                "username": "Tweet",
-                "avatar_url": "https://i.imgur.com/q3iAY1B.png",
-                "embeds": [{
-                  "author": {
-                    "name": player_name + "#" + hashtag,
-                    "icon_url": "https://i.imgur.com/nMRazCT.png"
-                  },
-                  "color": 5746931,
-                  "timestamp": moment(temp_obj.data_time_ms).format('YYYY-MM-DD[T]HH:mm:ss.SSS') + "Z",
-                  "fields": [{
-                      "name": "Trophies",
-                      "value": trophies
-                    },
-                    {
-                      "name": "Best Season Rank",
-                      "value": best_season_rank
-                    },
-                    {
-                      "name": "Best Season Trophies",
-                      "value": best_season
-                    },
-                    {
-                      "name": "Best Season Date",
-                      "value": best_season_date
-                    },
-                    {
-                      "name": "Previous Season",
-                      "value": previous_season + previous_season_best
-                    },
-                    {
-                      "name": "Max Wins",
-                      "value": max_wins
-                    },
-                    {
-                      "name": "Cards Won",
-                      "value": cards_won
-                    },
-                    {
-                      "name": "Experience",
-                      "value": experience
-                    },
-                    {
-                      "name": "Player Profile",
-                      "value": player_profile
-                    },
-                    {
-                      "name": "Post",
-                      "value": player_post
-                    },
-                    {
-                      "name": "Friend Link",
-                      "value": friend_link
-                    }
-                  ],
-                  "image": {
-                    "url": goqrme
-                  },
-                  "footer": {
-                    "text": moment(temp_obj.data_time_ms).format('YYYY-MM-DD[T]HH:mm:ss.SSS') + "Z"
+        };
+        const ra_req = https.request(ra_options, (res) => {
+          res.setEncoding("utf8"); // makes sure that "chunk" is a string.
+          let raFullBody = "";
+          res.on("data", data => {
+            raFullBody += data;
+          });
+          res.on("end", () => {
+            try {
+              var url = process.env.WEBHOOK_FILTERED_URL;
+              var player_name = "N/A";
+              var trophies = "N/A";
+              var best_season = "N/A";
+              var best_season_rank = "N/A";
+              var best_season_date = "N/A";
+              var previous_season = "N/A";
+              var previous_season_best = "";
+              var max_wins = "N/A";
+              var cards_won = "N/A";
+              var experience = "N/A";
+              const $ = cheerio.load(raFullBody);
+              var text_header = $('h1.header').first().text();
+              if (typeof text_header !== 'undefined' && text_header !== false && text_header !== "") {
+                player_name = text_header.trim() + ' ';
+              }
+              var text_item = $('div.horizontal').first().children().first().text();
+              if (typeof text_item !== 'undefined' && text_item !== false && text_item !== "") {
+                trophies = text_item.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_best_season_rank = $("img[src$='rank.png']").first().parent().find('tr').eq(2).find('td').eq(1).text();
+              if (typeof text_td_best_season_rank !== 'undefined' && text_td_best_season_rank !== false && text_td_best_season_rank !== "") {
+                best_season_rank = text_td_best_season_rank.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_best_season = $("img[src$='rank.png']").first().parent().find('tr').eq(3).find('td').eq(1).text();
+              if (typeof text_td_best_season !== 'undefined' && text_td_best_season !== false && text_td_best_season !== "") {
+                best_season = text_td_best_season.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_best_season_date = $("img[src$='rank.png']").first().parent().find('tr').eq(4).find('td').eq(1).text();
+              if (typeof text_td_best_season_date !== 'undefined' && text_td_best_season_date !== false && text_td_best_season_date !== "") {
+                best_season_date = text_td_best_season_date.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_previous_season = $("img[src$='rank.png']").first().parent().find('tr').eq(-2).find('td').eq(1).text();
+              if (typeof text_td_previous_season !== 'undefined' && text_td_previous_season !== false && text_td_previous_season !== "") {
+                previous_season = text_td_previous_season.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_previous_season_best = $("img[src$='rank.png']").first().parent().find('tr').eq(-1).find('td').eq(1).text();
+              if (typeof text_td_previous_season_best !== 'undefined' && text_td_previous_season_best !== false && text_td_previous_season_best !== "") {
+                previous_season_best = " / " + text_td_previous_season_best.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_max_wins = $("img[src$='tournament.png']").first().parent().find('tr').eq(1).find('td').eq(1).text();
+              if (typeof text_td_max_wins !== 'undefined' && text_td_max_wins !== false && text_td_max_wins !== "") {
+                max_wins = text_td_max_wins.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_cards_won = $("img[src$='tournament.png']").first().parent().find('tr').eq(2).find('td').eq(1).text();
+              if (typeof text_td_cards_won !== 'undefined' && text_td_cards_won !== false && text_td_cards_won !== "") {
+                cards_won = text_td_cards_won.trim().replace(/\s{2,}/g, ' ');
+              }
+              var text_td_experience = $("img[src$='cards.png']").first().parent().find('tr').eq(0).find('td').eq(1).text();
+              if (typeof text_td_experience !== 'undefined' && text_td_experience !== false && text_td_experience !== "") {
+                experience = text_td_experience.trim().replace(/\s{2,}/g, ' ');
+              }
+              if (trophies.includes('7,') || trophies.includes('8,') || trophies.includes('N/A')) {
+                request({
+                  url: url,
+                  method: "POST",
+                  json: {
+                    "username": "Tweet",
+                    "avatar_url": "https://i.imgur.com/q3iAY1B.png",
+                    "embeds": [{
+                      "author": {
+                        "name": player_name + "#" + hashtag,
+                        "icon_url": "https://i.imgur.com/nMRazCT.png"
+                      },
+                      "color": 5746931,
+                      "timestamp": moment(temp_obj.data_time_ms).format('YYYY-MM-DD[T]HH:mm:ss.SSS') + "Z",
+                      "fields": [{
+                          "name": "Trophies",
+                          "value": trophies
+                        },
+                        {
+                          "name": "Best Season Rank",
+                          "value": best_season_rank
+                        },
+                        {
+                          "name": "Best Season Trophies",
+                          "value": best_season
+                        },
+                        {
+                          "name": "Best Season Date",
+                          "value": best_season_date
+                        },
+                        {
+                          "name": "Previous Season",
+                          "value": previous_season + previous_season_best
+                        },
+                        {
+                          "name": "Max Wins",
+                          "value": max_wins
+                        },
+                        {
+                          "name": "Cards Won",
+                          "value": cards_won
+                        },
+                        {
+                          "name": "Experience",
+                          "value": experience
+                        },
+                        {
+                          "name": "Player Profile",
+                          "value": player_profile
+                        },
+                        {
+                          "name": "Post",
+                          "value": player_post
+                        },
+                        {
+                          "name": "Friend Link",
+                          "value": friend_link
+                        }
+                      ],
+                      "image": {
+                        "url": goqrme
+                      },
+                      "footer": {
+                        "text": moment(temp_obj.data_time_ms).format('YYYY-MM-DD[T]HH:mm:ss.SSS') + "Z"
+                      }
+                    }]
                   }
-                }]
+                }, function(error, response, body) {
+                  if (error) {
+                    console.log(error);
+                    //my_array.unshift(temp_obj);
+                  }
+                });
               }
-            }, function(error, response, body) {
-              if (error) {
-                console.log(error);
-                //my_array.unshift(temp_obj);
-              }
-            });
-          }
+            } catch (e) {}
+          });
         });
+        ra_req.on('error', (e) => {
+          console.error(e);
+        });
+        ra_req.end();
       }
     }
   }
@@ -238,14 +257,15 @@ setInterval(function() {
 setInterval(function() {
   var d = new Date((new Date).getTime());
   var h = d.getHours();
-  if ( h < 12) {
-    customHeaderRequest.get(process.env.AM_URL, function(err, resp, body){});
+  if (h < 12) {
+    customHeaderRequest.get(process.env.AM_URL, function(err, resp, body) {});
   } else {
-    customHeaderRequest.get(process.env.PM_URL, function(err, resp, body){});
+    customHeaderRequest.get(process.env.PM_URL, function(err, resp, body) {});
   }
-  if ( h == 23) {
-    customHeaderRequest.get(process.env.AM_URL, function(err, resp, body){});
+  if (h == 23) {
+    customHeaderRequest.get(process.env.AM_URL, function(err, resp, body) {});
   }
-  if ( h == 11) {
-    customHeaderRequest.get(process.env.PM_URL, function(err, resp, body){});
-}}, 300000); // every 5 minutes (300000) 
+  if (h == 11) {
+    customHeaderRequest.get(process.env.PM_URL, function(err, resp, body) {});
+  }
+}, 300000); // every 5 minutes (300000) 
